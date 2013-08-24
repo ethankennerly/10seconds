@@ -1,0 +1,80 @@
+
+Fri 08/23/2013 
+18:04
+
+10 seconds: ideas
+	10 seconds before a bomb explodes (jazmine sullivan)
+		bomb cutter. observe tiles of wires.  cut the wire that connects to a bomb.  multiple wires of same color.
+			multiple stages. cut and splice.  http://www.funny-games.biz/defuse_bomb.html
+		find the bomb in 10 seconds.  it is hidden on the board.
+		Bomb Squad http://www.youtube.com/watch?v=w8eA-kxhcZc
+	fast food.  ingredients.  goal.  cook in 10 seconds.
+	terrique:  collect items:  time limit
+	racing game:  california driving
+	mini game wario ware:  10 seconds to do a task
+	terrique:  turn by turn:  plan out each turn
+		robo rally:  program a robot to move 10 times, given what others may be doing.
+		sailing:  plot a course during each 10 seconds.  
+		final fantasy tactics:  plan out turns.
+	bullet hell that lasts only 10 seconds.
+	sailing:  10 seconds to trim the jib
+	10 seconds to connect a train to a station:  http://www.starfallplay.com/driving/10-seconds/
+	terrique:  power that lasts for 10 seconds, like a ghost that can travel for ten seconds to open doors, through walls.
+		legend of kage:  turn into a bird or tiger for 10 seconds
+		altered beast:  turn into a tiger for 10 seconds
+	10 seconds to wire a connection
+	the game literally lasts 10 seconds.  collect as much as you can as fast as you can.
+	pipes.  connect pipes.
+	fight!  you have 10 seconds to live.
+	the world is crumbling beneath your feet in 10 seconds.  run!
+	your boat will crash into another.  steer the boat or trim the jib.
+	eating game.  ten courses.
+	10 seconds to shoot the prey.
+	perfect time is 10 seconds.
+	10 second ninja:  http://www.youtube.com/watch?v=GcJkiLmtz3w   http://www.10secondninja.com/main.html   
+	trace a shape in 10 seconds.
+	divert tracks to avoid a crash in 10 seconds.
+	super hexagon.  10 seconds to live.
+	other fellow behind me:  10 seconds of air to escape.	
+	10 second warrior:  slash and jump.  
+	complete pattern of symbols in 10 seconds:  http://www.youtube.com/watch?v=INd2h9XoTH4
+	coorganizer:  bull riding for 10 seconds
+	10 second wave in a scrolling shooter.
+
+
+Fri 08/23/2013 
+20:52
+
+design fixed configuration of tiles.  then randomly generate those tiles.
+	explicit button near node.
+	lines
+	tile
+		text
+		pixels in a bitmap
+		auto edge (auto edge by overlaps)
+		mark overlaps
+	click nearest wire.
+	shuffle connections
+countdown 10 seconds
+pair of nodes on screen.
+click button to disconnect the pair.
+	- buttons are close together.
+		mouse over any side highlights that area.
+		buttons are connected at top in a row.
+once a cell is occupied, another cell cannot be adajacent.  it can go over or under.  there are exactly two layers.  any crossing must be exactly perpendicular.
+first click selects.
+second click pulls.
+wire takes random cells, generally going straight for a bit.
+randomly overlay one wire on top of another.
+pathfind then randomize nodes
+difficulty
+	number of cells
+	excess manhattan length
+	parallel proximity for confusion
+	random side of node to connecting node
+	range of crossings
+	maybe multiple wires
+place a button
+	select nearest wire.
+	side of nearest node.
+
