@@ -9,7 +9,14 @@ package com.finegamedesign.tenseconds
 
         public function AnswerButton()
         {
-            this.addEventListener(MouseEvent.CLICK, onClick, false, 0, true);
+            this.addEventListener(MouseEvent.MOUSE_DOWN, onClick, false, 0, true);
+        }
+
+        internal function disable():void
+        {
+            mouseEnabled = false;
+            upState = downState;
+            overState = downState;
         }
     }
 }

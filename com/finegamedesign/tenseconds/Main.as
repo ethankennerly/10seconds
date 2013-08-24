@@ -33,6 +33,17 @@ package com.finegamedesign.tenseconds
             mouseChildren = true;
         }
 
+        public function next():void
+        {
+            if (currentFrame < totalFrames) {
+                play();
+            }
+            else {
+                gotoAndPlay(1);
+            }
+            mouseChildren = true;
+        }
+
         private function updateTime(event:Event):void
         {
             if (inTrial) {
@@ -50,18 +61,14 @@ package com.finegamedesign.tenseconds
 
         private function answer(event:Event):void
         {
-            trace("Main.answer: " + event.currentTarget.name);
-            var correct:Boolean = "correct" === event.currentTarget.name;
+            var target:AnswerButton = AnswerButton(event.currentTarget);
+            trace("Main.answer: " + target.name);
+            target.disable();
+            var correct:Boolean = "correct" == target.name;
             if (correct) {
                 inTrial = false;
                 mouseChildren = false;
                 feedback.gotoAndPlay("correct");
-                if (currentFrame < totalFrames) {
-                    play();
-                }
-                else {
-                    gotoAndPlay(1);
-                }
             }
             else {
                 wrong();
