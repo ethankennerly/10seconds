@@ -1,3 +1,39 @@
+TODO
+	design fixed configuration of tiles.  then randomly generate those tiles.
+		explicit button near node.
+		lines
+		tile
+			text
+			pixels in a bitmap
+			auto edge (auto edge by overlaps)
+			mark overlaps
+		click nearest wire.
+		shuffle connections
+	countdown 10 seconds
+	light up selected connection
+	pair of nodes on screen.
+	click button to disconnect the pair.
+		- buttons are close together.
+			mouse over any side highlights that area.
+			buttons are connected at top in a row.
+	once a cell is occupied, another cell cannot be adajacent.  it can go over or under.  there are exactly two layers.  any crossing must be exactly perpendicular.
+	first click selects.
+	second click pulls.
+	wire takes random cells, generally going straight for a bit.
+	randomly overlay one wire on top of another.
+	pathfind then randomize nodes
+	difficulty
+		number of cells
+		excess manhattan length
+		parallel proximity for confusion
+		random side of node to connecting node
+		range of crossings
+		maybe multiple wires
+	place a button
+		select nearest wire.
+		side of nearest node.
+	countdown in LCD font
+
 
 Fri 08/23/2013 
 18:04
