@@ -29,6 +29,11 @@ package com.finegamedesign.tenseconds
             updateScoreText();
         }
 
+        internal static function fuseButton():FuseButton
+        {
+            return new FuseButton();
+        }
+
         public function trial():void
         {
             stop();
