@@ -116,3 +116,27 @@ place a button
 	select nearest wire.
 	side of nearest node.
 
+Sat 08/24/2013 
+15:14
+
+model grid of cells.
+
+place nodes near edges with buffer.
+draw segment of each line.  
+	not overlapping any other node.
+	not overlapping proximity of other lines.
+	line is long enough.
+	line has enough perpendicular overlaps.
+	
+draw line with one corner between two nodes.
+reroute and add corners until 
+	not overlapping any other node.
+	not overlapping proximity of other lines.
+	line is long enough.
+	line has enough perpendicular overlaps.
+
+draw line.
+	drop shadow filter.
+	replace intersection with random custom shadow intersection.
+
+
