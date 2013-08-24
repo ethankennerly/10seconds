@@ -88,6 +88,7 @@ package com.finegamedesign.tenseconds
                     }
                     var seconds:int = Math.max(0, Math.ceil(remaining / 1000));
                     timeTextField.text = "0:" + (10 <= seconds ? "" : "0") + seconds.toString();
+                    score_txt.text = (score + int(remaining / 1000) * 1000).toString();
                 }
                 else {
                     remaining = 0;
@@ -122,6 +123,7 @@ package com.finegamedesign.tenseconds
             inTrial = false;
             mouseChildren = false;
             feedback.gotoAndPlay("wrong");
+            updateScoreText();
         }
     }
 }

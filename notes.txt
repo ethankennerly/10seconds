@@ -1,5 +1,6 @@
 TODO
-	Play 3 levels.  Jethro expects more.
+	Tyriq Plummer may expect first trial has red wire.
+	Play 3 levels.  Jethro expects more. (13/8/24 4:00 +Tyriq)
 	difficulty
 		number of cells
 		excess manhattan length
@@ -139,4 +140,4 @@ draw line.
 	drop shadow filter.
 	replace intersection with random custom shadow intersection.
 
-
+10x10 sample.  draw these.
