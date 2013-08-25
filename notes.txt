@@ -1,7 +1,6 @@
 TODO
-	Play 3 levels.  Jethro expects more. (13/8/24 4:00 +Tyriq)
-	pair of nodes on screen.
-	connect each node
+	Path avoids button areas.
+	Path avoids backtracking.
 	difficulty
 		number of cells
 		excess manhattan length
@@ -10,13 +9,9 @@ TODO
 		number of corners
 		number of crossings
 		multiple wires
-	shuffle connections
-	light up selected connection
 	once a cell is occupied, another cell cannot be adajacent.  it can go over or under.  there are exactly two layers.  any crossing must be exactly perpendicular.
 	generate grids and sort by level.
 	randomly overlay one wire on top of another.
-	record level.  show max level.  continue at level.
-	10 trials.
 	100 seconds to do as many trials.
 	wire takes random cells, generally going straight for a bit.
 	pathfind then randomize nodes
@@ -25,6 +20,7 @@ TODO
 		side of nearest node.
 	randomly generate those tiles.
 	countdown in LCD font
+	bomb on screen
 	in last second, tenths of a second.
 	design fixed configuration of tiles.  
 		lines
@@ -160,3 +156,8 @@ Sun 08/25/2013
 
 
 
+Sun 08/25/2013 
+14:15
+
+Path avoids button areas.
+Path avoids backtracking.

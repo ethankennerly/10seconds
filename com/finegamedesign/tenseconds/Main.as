@@ -65,7 +65,7 @@ package com.finegamedesign.tenseconds
 
         public function next():void
         {
-            if (currentLabel == "start" && 30 <= Trial.level) {
+            if (currentLabel == "start" && 45 <= Trial.level) {
                 gotoAndPlay("random");
             }
             else if (currentFrame < totalFrames) {
@@ -141,7 +141,7 @@ package com.finegamedesign.tenseconds
             inTrial = false;
             mouseChildren = false;
             feedback.gotoAndPlay("wrong");
-            Trial.level = Math.max(0, Trial.level - 20);
+            Trial.level = Math.max(0, Trial.level - 10);
             level_txt.text = Trial.level.toString();
             updateScoreText();
         }

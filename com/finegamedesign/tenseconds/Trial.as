@@ -6,7 +6,7 @@ package com.finegamedesign.tenseconds
     public class Trial extends Sprite
     {
         internal static var level:int = 0;
-        internal static var maxLevel:int = 60;
+        internal static var maxLevel:int = 100;
 
         /**
          * Replace contents with a board.

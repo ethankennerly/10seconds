@@ -8,6 +8,7 @@ package com.finegamedesign.tenseconds
         private static var turn:Boolean = true;
 
         internal var buttonRotations:Array;
+        internal var noButtonHeres:Array;
         internal var cellCount:int;
         internal var cellPixels:int;
         internal var cells:Array;
@@ -22,6 +23,7 @@ package com.finegamedesign.tenseconds
         internal var rowCount:int;
         internal var width:int;
         internal var top:int;
+        internal var turnMax:int;
         internal var paths:Array;
 
         public function Grid(level:int)
@@ -38,12 +40,13 @@ package com.finegamedesign.tenseconds
             for (var i:int = 0; i < cellCount; i++) {
                 cells.push(0);
             }
-            nodeCount = Math.min(5, 2 + level / 20);
+            nodeCount = Math.min(5, 1 + level / 25);
+            turnMax = Math.min(8, 0 + level / 20);
             nodes = specifyNodes();
             nodeCoordinates = new Vector.<Number>();
             coordinate(nodes, nodeCoordinates);
             buttonRotations = specifyButtonRotations(nodeCount);
-            connections = shuffleConnections(nodeCount);
+            connections = connect(nodeCount);
             paths = specifyPaths(nodes, buttonRotations, connections);
         }
 
@@ -136,10 +139,9 @@ package com.finegamedesign.tenseconds
         }
 
         /**
-         * TODO: Shuffle?
          * @return  connections     2D array of each node's button's destination node's button.  Pair, so opposite direction is omitted.  01 exists, 10 does not exist.
          */
-        private function shuffleConnections(nodeCount:int):Array
+        private function connect(nodeCount:int):Array
         {
             var connections:Array = [];
             for (var n:int = 0; n < nodeCount - 1; n++) {
@@ -148,12 +150,14 @@ package com.finegamedesign.tenseconds
                     connections[n].push(m);
                 }
             }
-            // trace("shuffleConnections: nodes " + nodeCount + ": " + connections);
+            // trace("connect: nodes " + nodeCount + ": " + connections);
             return connections;
         }
 
         /**
          * Line from each origin to destination.
+         * Axis-aligned lines.
+         * TODO: Avoid button areas.
          * TODO: Specify corners from start and finish of a path.
          * Increment count of paths passing through a cell.
          * Do not pass through any cell with 2 or more.
@@ -170,22 +174,22 @@ package com.finegamedesign.tenseconds
                     var rotation:Number = buttonRotations[n][n + b];
                     var origin:int = fromNode(rotation, nodes[n]);
                     if (origin <= -1) {
-                        throw new Error("Expected origin on grid rotation " + rotation + " from node " + nodes[n]);
+                        throw new Error("Expected origin on grid rotation " 
+                            + rotation + " from node " + nodes[n]);
                     }
-                    var origin1:int = turnFromNode(rotation, origin);
                     indexes.push(origin);
                     if (turn) {
-                        indexes.push(origin1);
+                        turns(rotation, origin, turnMax, indexes);
                     }
                     rotation = buttonRotations[connections[n][b]][n];
                     var destination:int = fromNode(rotation, nodes[connections[n][b]]);
-                    var destination1:int = turnFromNode(rotation, destination);
                     if (destination <= -1) {
-                        throw new Error("Expected origin on grid rotation " + rotation + " from node " + nodes[n]);
+                        throw new Error("Expected origin on grid rotation " 
+                            + rotation + " from node " + nodes[n]);
                     }
                     if (turn) {
-                        indexes.push(destination1);
-                }
+                        turns(rotation, destination, turnMax, indexes);
+                    }
                     indexes.push(destination);
                                         
                     coordinate(indexes, coordinates);
@@ -193,6 +197,15 @@ package com.finegamedesign.tenseconds
                 }
             }
             return paths;
+        }
+
+        private function turns(rotation:Number, origin:int, turnMax:int, indexes:Array):void
+        {
+            var waypoint:Object = {rotation: rotation, index: origin};
+            for (var turnCount:int = 0; turnCount < turnMax; turnCount++) { 
+                waypoint = turnFromNode(waypoint["rotation"], waypoint["index"]);
+                indexes.push(waypoint["index"]);
+            }
         }
 
         /**
@@ -214,20 +227,56 @@ package com.finegamedesign.tenseconds
             return index;
         }
 
-        private function turnFromNode(rotation:Number, index:int):int
+        /**
+         * Avoid button areas.
+         * @return  waypoint with a rotation and index.
+         */
+        private function turnFromNode(rotation:Number, index:int):Object
         {
             var maybes:Array = [];
             for (var i:int = -1; i < 2; i++) {
                 var mayRotate:Number = rotation + 90 * i;
                 var maybe:int = fromNode(mayRotate, index);
                 if (0 <= maybe) {
-                    maybes.push(maybe);
+                    maybes.push({index: maybe, rotation: mayRotate});
                 }
             }
             if (maybes.length <= 0) {
                 throw new Error("Expected at least one possible waypoint.");
             }
+            var clears:Array = [];
+            for (var m:int = 0; m < maybes.length; m++) {
+                if (noButtonHere(maybes[m].index)) {
+                    clears.push(maybes[m]);
+                }
+            }
+            if (1 <= clears.length) {
+                maybes = clears;
+            }
             return maybes[int(Math.random() * maybes.length)];
+        }
+
+        private function noButtonHere(index:int):Boolean
+        {
+            if (null == noButtonHeres) {
+                noButtonHeres = [];
+                for (var i:int = 0; i < cellCount; i++) {
+                    noButtonHeres[i] = true;
+                }
+                for (var n:int = 0; n < nodes.length; n++) {
+                    var node:int = nodes[n];
+                    for (var c:int = Math.max(0, node % columnCount - margin); 
+                            c < Math.min(columnCount - 1, node % columnCount + margin);
+                            c++) {
+                        for (var r:int = Math.max(0, int(node / columnCount) - margin); 
+                                r < Math.min(columnCount - 1, int(node / columnCount) + margin);
+                                r++) {
+                            noButtonHeres[c + r * c] = false;
+                        }
+                    }
+                }
+            }
+            return noButtonHeres[index];
         }
 
         /**

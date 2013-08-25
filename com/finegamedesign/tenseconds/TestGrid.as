@@ -17,7 +17,7 @@ package com.finegamedesign.tenseconds
         {
             var parent:Sprite = new Sprite();
             var columns:int = 10;
-            for (var i:int = 0; i < columns * Trial.maxLevel; i++) {
+            for (var i:int = 0; i < Trial.maxLevel; i++) {
                 var grid:Grid = new Grid(i);
                 var board:Board = new Board(grid);
                 visualizeNodes(board.display, grid.nodeCoordinates, grid.nodePixelsRadius);
