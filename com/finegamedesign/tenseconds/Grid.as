@@ -49,42 +49,52 @@ package com.finegamedesign.tenseconds
             for (var i:int = 0; i < cellCount; i++) {
                 var c:int = i % columnCount;
                 var r:int = i / rowCount;
-                if (margin < c && c < columnCount - margin && (c < columnCenter - margin || columnCenter + margin < c)) {
-                    if (margin < r && r < rowCount - margin && (r < rowCenter - margin || rowCenter + margin < r)) {
+                if (margin < c && c < columnCount - margin
+                 && margin < r && r < rowCount - margin) {
+                        if (c < columnCenter - margin || columnCenter + margin < c
+                         || r < rowCenter - margin || rowCenter + margin < r) {
                         indexes.push(i);
                     }
                 }
             }
-            indexes = distribute(indexes, 4, margin);
+            indexes = distribute(indexes, 5, margin);
             return indexes;
         }
 
         /**
          * Reserve space between, with some room to jitter.
+         * Corners first.  Long sides second.
          * @return  indexes     Removed.
          */
         private function distribute(indexes:Array, nodeCount:int, margin:int):Array
         {
-            var nodeMargin:int = margin; // ((columnCount - 4 * margin) * (rowCount - 4 * margin)) / (nodeCount + margin + 8);
+            var nodeMargin:int = 2 * margin;
             if (nodeMargin < margin) {
                 throw new Error("Expected node margin at least " + margin + " cells. Got " + nodeMargin);
             }
-            var remaining:Array = indexes.concat();
-            var selected:Array = [];
-            for (var n:int = 0; n < nodeCount; n++) {
-                if (remaining.length <= 0) {
-                    throw new Error("Expected at least one remaining from " + indexes.length + " indexes at margin " + nodeMargin + " indexes " + indexes);
-                }
-                shuffle(remaining);
-                selected.push(remaining[0]);
-                var selectedColumn:int = remaining[0] % columnCount;
-                var selectedRow:int = remaining[0] / columnCount;
-                for (var i:int = remaining.length - 1; 0 <= i; i--) {
-                    var c:int = remaining[i] % columnCount;
-                    var r:int = remaining[i] / rowCount;
-                    if (Math.abs(r - selectedRow) < nodeMargin || Math.abs(c - selectedColumn) < nodeMargin) {
-                        remaining.splice(i, 1);
+            var succeeded:Boolean = false;
+            while (!succeeded) {
+                var remaining:Array = indexes.concat();
+                var selected:Array = [];
+                succeeded = true;
+                for (var n:int = 0; n < nodeCount; n++) {
+                    if (remaining.length <= 0) {
+                        trace("Expected at least one remaining from " + indexes.length + " indexes at margin " + nodeMargin + " indexes " + indexes);
+                        succeeded = false;
+                        break;
                     }
+                    var s:int = Math.random() * 10;
+                    selected.push(remaining[s]);
+                    var selectedColumn:int = remaining[s] % columnCount;
+                    var selectedRow:int = remaining[s] / rowCount;
+                    for (var i:int = remaining.length - 1; 0 <= i; i--) {
+                        var c:int = remaining[i] % columnCount;
+                        var r:int = remaining[i] / rowCount;
+                        if (Math.abs(r - selectedRow) < nodeMargin && Math.abs(c - selectedColumn) < nodeMargin) {
+                            remaining.splice(i, 1);
+                        }
+                    }
+                    shuffle(remaining);
                 }
             }
             return selected;
