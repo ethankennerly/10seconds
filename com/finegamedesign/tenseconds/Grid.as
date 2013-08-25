@@ -56,7 +56,7 @@ package com.finegamedesign.tenseconds
             var rowCenter:int = rowCount / 2;
             for (var i:int = 0; i < cellCount; i++) {
                 var c:int = i % columnCount;
-                var r:int = i / rowCount;
+                var r:int = i / columnCount;
                 if (margin < c && c < columnCount - margin
                  && margin < r && r < rowCount - margin) {
                         if (c < columnCenter - margin || columnCenter + margin < c
@@ -94,10 +94,10 @@ package com.finegamedesign.tenseconds
                     var s:int = 0;  //Math.random() * 10;
                     selected.push(remaining[s]);
                     var selectedColumn:int = remaining[s] % columnCount;
-                    var selectedRow:int = remaining[s] / rowCount;
+                    var selectedRow:int = remaining[s] / columnCount;
                     for (var i:int = remaining.length - 1; 0 <= i; i--) {
                         var c:int = remaining[i] % columnCount;
-                        var r:int = remaining[i] / rowCount;
+                        var r:int = remaining[i] / columnCount;
                         if (Math.abs(r - selectedRow) <= nodeMargin && Math.abs(c - selectedColumn) <= nodeMargin) {
                             remaining.splice(i, 1);
                         }
@@ -164,12 +164,18 @@ package com.finegamedesign.tenseconds
                     var coordinates:Vector.<Number> = new Vector.<Number>();
                     var rotation:Number = buttonRotations[n][b];
                     var origin:int = fromNode(rotation, nodes[n]);
+                    if (origin <= -1) {
+                        throw new Error("Expected origin on grid rotation " + rotation + " from node " + nodes[n]);
+                    }
                     var origin1:int = turnFromNode(rotation, origin);
                     indexes.push(origin);
                     indexes.push(origin1);
                     rotation = buttonRotations[connections[n][b]][b];
                     var destination:int = fromNode(rotation, nodes[connections[n][b]]);
                     var destination1:int = turnFromNode(rotation, destination);
+                    if (destination <= -1) {
+                        throw new Error("Expected origin on grid rotation " + rotation + " from node " + nodes[n]);
+                    }
                     indexes.push(destination1);
                     indexes.push(destination);
                                         
@@ -209,15 +215,21 @@ package com.finegamedesign.tenseconds
                     maybes.push(maybe);
                 }
             }
+            if (maybes.length <= 0) {
+                throw new Error("Expected at least one possible waypoint.");
+            }
             return maybes[int(Math.random() * maybes.length)];
         }
 
+        /**
+         * 90 degree increments.
+         */
         private function specifyButtonRotations(nodeCount:int):Array
         {
             var buttonRotations:Array = [];
             if (2 <= nodeCount) {
-                var degree:Number = 360.0 / (nodeCount - 1);
-                var offset:Number = 0; // Math.random() * degree;
+                var degree:Number = 90.0;  // 360.0 / (nodeCount - 1);
+                var offset:Number = 0;  // Math.random() * degree;
                 for (var n:int = 0; n < nodeCount; n++) {
                     buttonRotations.push([]);
                     for (var m:int = 0; m < nodeCount - 1; m++) {
