@@ -20,6 +20,7 @@ package com.finegamedesign.tenseconds
 
         public function Main()
         {
+            Board.filters = new WireFilter().getChildAt(0).filters;
             AnswerButton.onClick = answer;
             inTrial = false;
             addEventListener(Event.ENTER_FRAME, updateTime, false, 0, true);

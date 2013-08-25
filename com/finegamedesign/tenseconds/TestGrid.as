@@ -10,7 +10,7 @@ package com.finegamedesign.tenseconds
             var parent:Sprite = new Sprite();
             var columns:int = 10;
             for (var i:int = 0; i < columns * columns; i++) {
-                var board:Board = new Board(i);
+                var board:Board = new Board(new Grid(i));
                 board.display.x = 640 * (i % columns) / columns;
                 board.display.y = 480 * int(i / columns) / columns;
                 board.display.scaleX = 1.0 / columns;
