@@ -4,22 +4,25 @@ package com.finegamedesign.tenseconds
 
     public class Grid
     {
-        internal var nodePixelsRadius:int;
+        private static var shuffleNodes:Boolean = true;
+        private static var turn:Boolean = true;
+
+        internal var buttonRotations:Array;
         internal var cellCount:int;
         internal var cellPixels:int;
         internal var cells:Array;
         internal var columnCount:int;
         internal var connections:Array;
         internal var height:int;
+        internal var margin:int;
+        internal var nodes:Array;
+        internal var nodeCoordinates:Vector.<Number>;
         internal var nodeCount:int;
+        internal var nodePixelsRadius:int;
         internal var rowCount:int;
         internal var width:int;
         internal var top:int;
         internal var paths:Array;
-        internal var margin:int;
-        internal var nodes:Array;
-        internal var nodeCoordinates:Vector.<Number>;
-        internal var buttonRotations:Array;
 
         public function Grid(level:int)
         {
@@ -35,7 +38,7 @@ package com.finegamedesign.tenseconds
             for (var i:int = 0; i < cellCount; i++) {
                 cells.push(0);
             }
-            nodeCount = Math.min(5, 2 + level / 10);
+            nodeCount = Math.min(5, 2 + level / 20);
             nodes = specifyNodes();
             nodeCoordinates = new Vector.<Number>();
             coordinate(nodes, nodeCoordinates);
@@ -102,7 +105,9 @@ package com.finegamedesign.tenseconds
                             remaining.splice(i, 1);
                         }
                     }
-                    shuffle(remaining);
+                    if (shuffleNodes) {
+                        shuffle(remaining);
+                    }
                 }
             }
             return selected;
@@ -162,21 +167,25 @@ package com.finegamedesign.tenseconds
                 for (var b:int = 0; b < connections[n].length; b++) {
                     var indexes:Array = [];
                     var coordinates:Vector.<Number> = new Vector.<Number>();
-                    var rotation:Number = buttonRotations[n][b];
+                    var rotation:Number = buttonRotations[n][n + b];
                     var origin:int = fromNode(rotation, nodes[n]);
                     if (origin <= -1) {
                         throw new Error("Expected origin on grid rotation " + rotation + " from node " + nodes[n]);
                     }
                     var origin1:int = turnFromNode(rotation, origin);
                     indexes.push(origin);
-                    indexes.push(origin1);
-                    rotation = buttonRotations[connections[n][b]][b];
+                    if (turn) {
+                        indexes.push(origin1);
+                    }
+                    rotation = buttonRotations[connections[n][b]][n];
                     var destination:int = fromNode(rotation, nodes[connections[n][b]]);
                     var destination1:int = turnFromNode(rotation, destination);
                     if (destination <= -1) {
                         throw new Error("Expected origin on grid rotation " + rotation + " from node " + nodes[n]);
                     }
-                    indexes.push(destination1);
+                    if (turn) {
+                        indexes.push(destination1);
+                }
                     indexes.push(destination);
                                         
                     coordinate(indexes, coordinates);
@@ -222,20 +231,20 @@ package com.finegamedesign.tenseconds
         }
 
         /**
-         * 90 degree increments.
+         * 90 degree increments.  Shuffle correct.
          */
         private function specifyButtonRotations(nodeCount:int):Array
         {
             var buttonRotations:Array = [];
             if (2 <= nodeCount) {
-                var degree:Number = 90.0;  // 360.0 / (nodeCount - 1);
-                var offset:Number = 0;  // Math.random() * degree;
+                var degree:Number = 90.0;
                 for (var n:int = 0; n < nodeCount; n++) {
                     buttonRotations.push([]);
-                    for (var m:int = 0; m < nodeCount - 1; m++) {
-                        var rotation:Number = m * degree + offset;
+                    for (var rotation:int = 0; rotation < 360.0; rotation += degree) {
                         buttonRotations[n].push(rotation);
                     }
+                    shuffle(buttonRotations[n]);
+                    buttonRotations[n].splice(nodeCount - 1);
                 }
             }
             return buttonRotations;

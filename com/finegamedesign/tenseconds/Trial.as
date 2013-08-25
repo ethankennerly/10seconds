@@ -5,7 +5,8 @@ package com.finegamedesign.tenseconds
 
     public class Trial extends Sprite
     {
-        internal static var level:int = 100;
+        internal static var level:int = 0;
+        internal static var maxLevel:int = 60;
 
         /**
          * Replace contents with a board.
@@ -13,6 +14,11 @@ package com.finegamedesign.tenseconds
         public function Trial()
         {
             super();
+            replace();
+        }
+
+        internal function replace():void
+        {
             for (var c:int = numChildren - 1; 0 <= c; c--) {
                 removeChildAt(c);
             }
