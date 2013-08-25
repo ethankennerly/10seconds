@@ -9,6 +9,7 @@ package com.finegamedesign.tenseconds
         internal var cellPixels:int;
         internal var cells:Array;
         internal var columnCount:int;
+        internal var connections:Array;
         internal var height:int;
         internal var nodeCount:int;
         internal var rowCount:int;
@@ -39,7 +40,8 @@ package com.finegamedesign.tenseconds
             nodeCoordinates = new Vector.<Number>();
             coordinate(nodes, nodeCoordinates);
             buttonRotations = specifyButtonRotations(nodeCount);
-            paths = specifyPaths(nodes, buttonRotations);
+            connections = shuffleConnections(nodeCount);
+            paths = specifyPaths(nodes, buttonRotations, connections);
         }
 
         /**
@@ -129,34 +131,58 @@ package com.finegamedesign.tenseconds
         }
 
         /**
+         * TODO: Shuffle?
+         * @return  connections     2D array of each node's button's destination node's button.  Pair, so opposite direction is omitted.  01 exists, 10 does not exist.
+         */
+        private function shuffleConnections(nodeCount:int):Array
+        {
+            var connections:Array = [];
+            for (var n:int = 0; n < nodeCount - 1; n++) {
+                connections.push([]);
+                for (var m:int = n + 1; m < nodeCount; m++) {
+                    connections[n].push(m);
+                }
+            }
+            // trace("shuffleConnections: nodes " + nodeCount + ": " + connections);
+            return connections;
+        }
+
+        /**
+         * Line from each origin to destination.
          * TODO: Specify corners from start and finish of a path.
          * Increment count of paths passing through a cell.
          * Do not pass through any cell with 2 or more.
+         * @param   connections     2D array of each node's button's destination node's button.
          * @return [<moveToX, moveToY, lineToX, lineToY, lineToX, lineToY, ...>, ...]
          */
-        private function specifyPaths(nodes:Array, buttonRotations:Array):Array
+        private function specifyPaths(nodes:Array, buttonRotations:Array, connections:Array):Array
         {
             var paths:Array = [];
-            for (var n:int = 0; n < nodes.length; n++) {
-                for (var b:int = 0; b < buttonRotations[n].length; b++) {
+            for (var n:int = 0; n < connections.length; n++) {
+                for (var b:int = 0; b < connections[n].length; b++) {
                     var indexes:Array = [];
                     var coordinates:Vector.<Number> = new Vector.<Number>();
-                    var rotation:Number = buttonRotations[n][b];
-                    var radians:Number = rotation * Math.PI / 180.0;
-                    var columnOffset:int = margin * Math.cos(radians);
-                    var rowOffset:int = margin * Math.sin(radians);
-                    var index = nodes[n];
-                    var offset:int = columnOffset 
-                        + columnCount * rowOffset;
-                    index += offset;
+                    var index:int = fromNode(buttonRotations[n][b], nodes[n]);
                     indexes.push(index);
-                    // TODO:
-                    indexes.push(index + 3);
+                    var destination:int = fromNode(buttonRotations[connections[n][b]][b], nodes[connections[n][b]]);
+                    indexes.push(destination);
+                                        
                     coordinate(indexes, coordinates);
                     paths.push(coordinates);
                 }
             }
             return paths;
+        }
+
+        private function fromNode(rotation:Number, index:int):int
+        {
+            var radians:Number = rotation * Math.PI / 180.0;
+            var columnOffset:int = margin * Math.cos(radians);
+            var rowOffset:int = margin * Math.sin(radians);
+            var offset:int = columnOffset 
+                + columnCount * rowOffset;
+            index += offset;
+            return index;
         }
 
         private function specifyButtonRotations(nodeCount:int):Array
