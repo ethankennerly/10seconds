@@ -4,6 +4,7 @@ package com.finegamedesign.tenseconds
 
     public class Grid
     {
+        internal var nodePixelsRadius:int;
         internal var cellCount:int;
         internal var cellPixels:int;
         internal var cells:Array;
@@ -20,6 +21,7 @@ package com.finegamedesign.tenseconds
         {
             cellPixels = 16;
             height = 480;
+            nodePixelsRadius = 60;
             top = 60;
             width = 640;
             columnCount = width / cellPixels;
@@ -34,15 +36,58 @@ package com.finegamedesign.tenseconds
             paths = specifyPaths();
         }
 
+        /**
+         * Randomly distribute with room in center and at edges.
+         * Leave space between.
+         */
         private function specifyNodes():Array
         {
+            var margin:int = Math.ceil(nodePixelsRadius / cellPixels);
             var indexes:Array = [];
+            var columnCenter:int = columnCount / 2;
+            var rowCenter:int = rowCount / 2;
             for (var i:int = 0; i < cellCount; i++) {
-                indexes.push(i);
+                var c:int = i % columnCount;
+                var r:int = i / rowCount;
+                if (margin < c && c < columnCount - margin && (c < columnCenter - margin || columnCenter + margin < c)) {
+                    if (margin < r && r < rowCount - margin && (r < rowCenter - margin || rowCenter + margin < r)) {
+                        indexes.push(i);
+                    }
+                }
             }
-            shuffle(indexes);
-            var nodes:Array = indexes.slice(0, 2);
-            return nodes;
+            indexes = distribute(indexes, 4, margin);
+            return indexes;
+        }
+
+        /**
+         * Reserve space between, with some room to jitter.
+         * @return  indexes     Removed.
+         */
+        private function distribute(indexes:Array, nodeCount:int, margin:int):Array
+        {
+            var nodeMargin:int = margin; // ((columnCount - 4 * margin) * (rowCount - 4 * margin)) / (nodeCount + margin + 8);
+            if (nodeMargin < margin) {
+                throw new Error("Expected node margin at least " + margin + " cells. Got " + nodeMargin);
+            }
+            var remaining:Array = indexes.concat();
+            var selected:Array = [];
+            for (var n:int = 0; n < nodeCount; n++) {
+                if (remaining.length <= 0) {
+                    throw new Error("Expected at least one remaining from " + indexes.length + " indexes at margin " + nodeMargin + " indexes " + indexes);
+                }
+                shuffle(remaining);
+                selected.push(remaining[0]);
+                var selectedColumn:int = remaining[0] % columnCount;
+                var selectedRow:int = remaining[0] / columnCount;
+                for (var i:int = remaining.length - 1; 0 <= i; i--) {
+                    var c:int = remaining[i] % columnCount;
+                    var r:int = remaining[i] / rowCount;
+                    if (Math.abs(r - selectedRow) < nodeMargin || Math.abs(c - selectedColumn) < nodeMargin) {
+                        remaining.splice(i, 1);
+                    }
+                }
+            }
+            return selected;
         }
 
         private function shuffle(elements:Array):void

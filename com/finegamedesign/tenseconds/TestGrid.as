@@ -10,7 +10,9 @@ package com.finegamedesign.tenseconds
             var parent:Sprite = new Sprite();
             var columns:int = 10;
             for (var i:int = 0; i < columns * columns; i++) {
-                var board:Board = new Board(new Grid(i));
+                var grid:Grid = new Grid(i);
+                var board:Board = new Board(grid);
+                visualizeNodes(board.display, grid.nodeCoordinates, grid.nodePixelsRadius);
                 board.display.x = 640 * (i % columns) / columns;
                 board.display.y = 480 * int(i / columns) / columns;
                 board.display.scaleX = 1.0 / columns;
@@ -18,6 +20,13 @@ package com.finegamedesign.tenseconds
                 parent.addChild(board.display);
             }
             addChild(parent);
+        }
+
+        private function visualizeNodes(parent:Sprite, coordinates:Vector.<Number>, radius:Number):void
+        {
+            for (var xy:int = 0; xy < coordinates.length - 1; xy+=2) {
+                parent.graphics.drawCircle(coordinates[xy], coordinates[xy + 1], radius);
+            }
         }
     }
 }
