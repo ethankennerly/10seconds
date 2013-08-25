@@ -18,8 +18,6 @@ package com.finegamedesign.tenseconds
             }
             var grid:Grid = new Grid(level);
             var board:Board = new Board(grid);
-            //- TestGrid.visualizeNodes(board.display, 
-            //-     grid.nodeCoordinates, grid.nodePixelsRadius);
             addChild(board.display);
             addNodes(grid.nodeCoordinates, grid.buttonRotations);
         }

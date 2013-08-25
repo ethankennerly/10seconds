@@ -162,9 +162,15 @@ package com.finegamedesign.tenseconds
                 for (var b:int = 0; b < connections[n].length; b++) {
                     var indexes:Array = [];
                     var coordinates:Vector.<Number> = new Vector.<Number>();
-                    var index:int = fromNode(buttonRotations[n][b], nodes[n]);
-                    indexes.push(index);
-                    var destination:int = fromNode(buttonRotations[connections[n][b]][b], nodes[connections[n][b]]);
+                    var rotation:Number = buttonRotations[n][b];
+                    var origin:int = fromNode(rotation, nodes[n]);
+                    var origin1:int = turnFromNode(rotation, origin);
+                    indexes.push(origin);
+                    indexes.push(origin1);
+                    rotation = buttonRotations[connections[n][b]][b];
+                    var destination:int = fromNode(rotation, nodes[connections[n][b]]);
+                    var destination1:int = turnFromNode(rotation, destination);
+                    indexes.push(destination1);
                     indexes.push(destination);
                                         
                     coordinate(indexes, coordinates);
@@ -174,15 +180,36 @@ package com.finegamedesign.tenseconds
             return paths;
         }
 
+        /**
+         * @return  -1 if wrapping an edge.
+         */
         private function fromNode(rotation:Number, index:int):int
         {
             var radians:Number = rotation * Math.PI / 180.0;
             var columnOffset:int = margin * Math.cos(radians);
             var rowOffset:int = margin * Math.sin(radians);
+            var c:int = index % columnCount + columnOffset;
+            var r:int = index / columnCount + rowOffset;
+            if (c < 0 || columnCount <= c || r < 0 || rowCount <= r) {
+                return -1;
+            }
             var offset:int = columnOffset 
                 + columnCount * rowOffset;
             index += offset;
             return index;
+        }
+
+        private function turnFromNode(rotation:Number, index:int):int
+        {
+            var maybes:Array = [];
+            for (var i:int = -1; i < 2; i++) {
+                var mayRotate:Number = rotation + 90 * i;
+                var maybe:int = fromNode(mayRotate, index);
+                if (0 <= maybe) {
+                    maybes.push(maybe);
+                }
+            }
+            return maybes[int(Math.random() * maybes.length)];
         }
 
         private function specifyButtonRotations(nodeCount:int):Array

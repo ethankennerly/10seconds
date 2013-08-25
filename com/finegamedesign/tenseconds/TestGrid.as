@@ -7,6 +7,7 @@ package com.finegamedesign.tenseconds
     {
         internal static function visualizeNodes(parent:Sprite, coordinates:Vector.<Number>, radius:Number):void
         {
+            parent.graphics.lineStyle(8.0, 0xFFFFFF);
             for (var xy:int = 0; xy < coordinates.length - 1; xy+=2) {
                 parent.graphics.drawCircle(coordinates[xy], coordinates[xy + 1], radius);
             }
@@ -24,6 +25,8 @@ package com.finegamedesign.tenseconds
                 board.display.y = 480 * int(i / columns) / columns;
                 board.display.scaleX = 1.0 / columns;
                 board.display.scaleY = 1.0 / columns;
+                TestGrid.visualizeNodes(board.display, 
+                    grid.nodeCoordinates, grid.nodePixelsRadius);
                 parent.addChild(board.display);
             }
             addChild(parent);
