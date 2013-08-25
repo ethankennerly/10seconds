@@ -5,6 +5,13 @@ package com.finegamedesign.tenseconds
     
     public class TestGrid extends TestCase 
     {
+        internal static function visualizeNodes(parent:Sprite, coordinates:Vector.<Number>, radius:Number):void
+        {
+            for (var xy:int = 0; xy < coordinates.length - 1; xy+=2) {
+                parent.graphics.drawCircle(coordinates[xy], coordinates[xy + 1], radius);
+            }
+        }
+
         public function testSample():void 
         {
             var parent:Sprite = new Sprite();
@@ -20,13 +27,6 @@ package com.finegamedesign.tenseconds
                 parent.addChild(board.display);
             }
             addChild(parent);
-        }
-
-        private function visualizeNodes(parent:Sprite, coordinates:Vector.<Number>, radius:Number):void
-        {
-            for (var xy:int = 0; xy < coordinates.length - 1; xy+=2) {
-                parent.graphics.drawCircle(coordinates[xy], coordinates[xy + 1], radius);
-            }
         }
     }
 }

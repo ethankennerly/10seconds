@@ -1,6 +1,7 @@
 TODO
-	Tyriq Plummer may expect first trial has red wire.
 	Play 3 levels.  Jethro expects more. (13/8/24 4:00 +Tyriq)
+	pair of nodes on screen.
+	connect each node
 	difficulty
 		number of cells
 		excess manhattan length
@@ -11,13 +12,12 @@ TODO
 		multiple wires
 	shuffle connections
 	light up selected connection
-	pair of nodes on screen.
-	click button to disconnect the pair.
-		- buttons are close together.
-			mouse over any side highlights that area.
-			buttons are connected at top in a row.
 	once a cell is occupied, another cell cannot be adajacent.  it can go over or under.  there are exactly two layers.  any crossing must be exactly perpendicular.
+	generate grids and sort by level.
 	randomly overlay one wire on top of another.
+	record level.  show max level.  continue at level.
+	10 trials.
+	100 seconds to do as many trials.
 	wire takes random cells, generally going straight for a bit.
 	pathfind then randomize nodes
 	place a button
@@ -36,6 +36,8 @@ TODO
 		click nearest wire.
 	first click selects.
 	second click pulls.
+	click button to disconnect the pair.
+			buttons are connected at top in a row.
 
 
 Fri 08/23/2013 
@@ -141,3 +143,11 @@ draw line.
 	replace intersection with random custom shadow intersection.
 
 10x10 sample.  draw these.
+
+
+Sat 08/24/2013 
+21:08
+
+Ugh.  About 4 hours shuffling nodes.
+Drawing the paths is more risk and important.
+

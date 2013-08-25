@@ -10,12 +10,15 @@ package com.finegamedesign.tenseconds
         internal var cells:Array;
         internal var columnCount:int;
         internal var height:int;
+        internal var nodeCount:int;
         internal var rowCount:int;
         internal var width:int;
         internal var top:int;
         internal var paths:Array;
+        internal var margin:int;
         internal var nodes:Array;
         internal var nodeCoordinates:Vector.<Number>;
+        internal var buttonRotations:Array;
 
         public function Grid(level:int)
         {
@@ -31,9 +34,11 @@ package com.finegamedesign.tenseconds
             for (var i:int = 0; i < cellCount; i++) {
                 cells.push(0);
             }
+            nodeCount = Math.min(5, 2 + level / 10);
             nodes = specifyNodes();
             nodeCoordinates = coordinate(nodes);
-            paths = specifyPaths();
+            buttonRotations = specifyButtonRotations(nodeCount);
+            paths = specifyPaths(nodes, buttonRotations);
         }
 
         /**
@@ -42,7 +47,7 @@ package com.finegamedesign.tenseconds
          */
         private function specifyNodes():Array
         {
-            var margin:int = Math.ceil(nodePixelsRadius / cellPixels);
+            margin = Math.ceil(nodePixelsRadius / cellPixels);
             var indexes:Array = [];
             var columnCenter:int = columnCount / 2;
             var rowCenter:int = rowCount / 2;
@@ -57,7 +62,7 @@ package com.finegamedesign.tenseconds
                     }
                 }
             }
-            indexes = distribute(indexes, 5, margin);
+            indexes = distribute(indexes, nodeCount, margin);
             return indexes;
         }
 
@@ -68,7 +73,7 @@ package com.finegamedesign.tenseconds
          */
         private function distribute(indexes:Array, nodeCount:int, margin:int):Array
         {
-            var nodeMargin:int = 2 * margin;
+            var nodeMargin:int = 2 * margin + 1;
             if (nodeMargin < margin) {
                 throw new Error("Expected node margin at least " + margin + " cells. Got " + nodeMargin);
             }
@@ -83,14 +88,14 @@ package com.finegamedesign.tenseconds
                         succeeded = false;
                         break;
                     }
-                    var s:int = Math.random() * 10;
+                    var s:int = 0;  //Math.random() * 10;
                     selected.push(remaining[s]);
                     var selectedColumn:int = remaining[s] % columnCount;
                     var selectedRow:int = remaining[s] / rowCount;
                     for (var i:int = remaining.length - 1; 0 <= i; i--) {
                         var c:int = remaining[i] % columnCount;
                         var r:int = remaining[i] / rowCount;
-                        if (Math.abs(r - selectedRow) < nodeMargin && Math.abs(c - selectedColumn) < nodeMargin) {
+                        if (Math.abs(r - selectedRow) <= nodeMargin && Math.abs(c - selectedColumn) <= nodeMargin) {
                             remaining.splice(i, 1);
                         }
                     }
@@ -125,27 +130,42 @@ package com.finegamedesign.tenseconds
         }
 
         /**
-         * Specify corners from start and finish of a path.
+         * TODO: Specify corners from start and finish of a path.
          * Increment count of paths passing through a cell.
          * Do not pass through any cell with 2 or more.
          * @return [<moveToX, moveToY, lineToX, lineToY, lineToX, lineToY, ...>, ...]
          */
-        private function specifyPaths():Array
+        private function specifyPaths(nodes:Array, buttonRotations:Array):Array
         {
             var paths:Array = [];
-            var coordinates:Vector.<Number> = new Vector.<Number>();
-            testPushCoordinates(coordinates);
-            paths.push(coordinates);
-            paths.push(nodeCoordinates);
+            for (var n:int = 0; n < nodes.length; n++) {
+                for (var b:int = 0; b < buttonRotations[n].length; b++) {
+                    var coordinates:Vector.<Number> = new Vector.<Number>();
+                    var rotation:Number = buttonRotations[n][b];
+                    var radians:Number = rotation * Math.PI / 180.0;
+                    var columnOffset:int = (margin / 2) * Math.cos(radians);
+                    var rowOffset:int = (margin / 2) * Math.sin(radians);
+                    // TODO: paths.push(coordinates);
+                }
+            }
             return paths;
         }
 
-        private function testPushCoordinates(coordinates:Vector.<Number>):void
+        private function specifyButtonRotations(nodeCount:int):Array
         {
-            coordinates.push(20.0);
-            coordinates.push(0.0);
-            coordinates.push(620.0);
-            coordinates.push(0.0);
+            var buttonRotations:Array = [];
+            if (2 <= nodeCount) {
+                var degree:Number = 360.0 / (nodeCount - 1);
+                var offset:Number = Math.random() * degree;
+                for (var n:int = 0; n < nodeCount; n++) {
+                    buttonRotations.push([]);
+                    for (var m:int = 0; m < nodeCount - 1; m++) {
+                        var rotation:Number = m * degree + offset;
+                        buttonRotations[n].push(rotation);
+                    }
+                }
+            }
+            return buttonRotations;
         }
     }
 }
