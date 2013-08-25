@@ -36,7 +36,8 @@ package com.finegamedesign.tenseconds
             }
             nodeCount = Math.min(5, 2 + level / 10);
             nodes = specifyNodes();
-            nodeCoordinates = coordinate(nodes);
+            nodeCoordinates = new Vector.<Number>();
+            coordinate(nodes, nodeCoordinates);
             buttonRotations = specifyButtonRotations(nodeCount);
             paths = specifyPaths(nodes, buttonRotations);
         }
@@ -117,16 +118,14 @@ package com.finegamedesign.tenseconds
 
         /**
          * Position at center of cell at each index.
-         * @return  <x0, y0, x1, y1, ...>
+         * @param   coordinates     Push in place <x0, y0, x1, y1, ...>
          */
-        private function coordinate(indexes:Array):Vector.<Number>
+        private function coordinate(indexes:Array, coordinates:Vector.<Number>):void
         {
-            var coordinates:Vector.<Number> = new Vector.<Number>();
             for (var i:int = 0; i < indexes.length; i++) {
                 coordinates.push(cellPixels * ((indexes[i] % columnCount) + 0.5));
                 coordinates.push(cellPixels * (int(indexes[i] / columnCount) + 0.5) + top);
             }
-            return coordinates;
         }
 
         /**
@@ -140,12 +139,21 @@ package com.finegamedesign.tenseconds
             var paths:Array = [];
             for (var n:int = 0; n < nodes.length; n++) {
                 for (var b:int = 0; b < buttonRotations[n].length; b++) {
+                    var indexes:Array = [];
                     var coordinates:Vector.<Number> = new Vector.<Number>();
                     var rotation:Number = buttonRotations[n][b];
                     var radians:Number = rotation * Math.PI / 180.0;
-                    var columnOffset:int = (margin / 2) * Math.cos(radians);
-                    var rowOffset:int = (margin / 2) * Math.sin(radians);
-                    // TODO: paths.push(coordinates);
+                    var columnOffset:int = margin * Math.cos(radians);
+                    var rowOffset:int = margin * Math.sin(radians);
+                    var index = nodes[n];
+                    var offset:int = columnOffset 
+                        + columnCount * rowOffset;
+                    index += offset;
+                    indexes.push(index);
+                    // TODO:
+                    indexes.push(index + 3);
+                    coordinate(indexes, coordinates);
+                    paths.push(coordinates);
                 }
             }
             return paths;
@@ -156,7 +164,7 @@ package com.finegamedesign.tenseconds
             var buttonRotations:Array = [];
             if (2 <= nodeCount) {
                 var degree:Number = 360.0 / (nodeCount - 1);
-                var offset:Number = Math.random() * degree;
+                var offset:Number = 0; // Math.random() * degree;
                 for (var n:int = 0; n < nodeCount; n++) {
                     buttonRotations.push([]);
                     for (var m:int = 0; m < nodeCount - 1; m++) {
