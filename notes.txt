@@ -1,4 +1,8 @@
 TODO
+	end tail rotated toward other tail.
+	connect tails.
+	do not overlap own path
+	shuffle turns instead of roll die for turn
 	Stephen expects paths do not overlap in parallel
 		Record each horizontal cell.
 		Record each vertical cell.
@@ -21,9 +25,6 @@ TODO
 	wire takes random cells, generally going straight for a bit.
 	pathfind then randomize nodes
 	randomize creases.
-	do not overlap own path
-	shuffle turns instead of roll die for turn
-	end tail rotated toward other tail..
 	place a button
 		select nearest wire.
 		side of nearest node.

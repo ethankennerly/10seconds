@@ -122,7 +122,8 @@ package com.finegamedesign.tenseconds
             target.disable();
             var correct:Boolean = "correct" == target.name;
             if (correct) {
-                Trial.level = Math.min(Trial.maxLevel, Trial.level + 5);
+                var add:int = remaining / 3000;
+                Trial.level = Math.min(Trial.maxLevel, Trial.level + add);
                 level_txt.text = Trial.level.toString();
                 if (inTrial) {
                     scoreUp();
@@ -141,7 +142,7 @@ package com.finegamedesign.tenseconds
             inTrial = false;
             mouseChildren = false;
             feedback.gotoAndPlay("wrong");
-            Trial.level = Math.max(0, Trial.level - 10);
+            Trial.level = Math.max(0, Trial.level - 5);
             level_txt.text = Trial.level.toString();
             updateScoreText();
         }

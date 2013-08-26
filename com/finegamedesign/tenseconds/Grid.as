@@ -46,8 +46,8 @@ package com.finegamedesign.tenseconds
                 pathsVertical[i] = false;
                 pathsHorizontal[i] = false;
             }
-            nodeCount = Math.max(2, Math.min(5, 1 + level / 24));
-            turnMax = Math.min(8, 0 + level / 20);
+            nodeCount = Math.max(2, Math.min(5, 1 + level / 12));
+            turnMax = Math.min(8, 0 + level / 10);
             nodes = specifyNodes();
             nodeCoordinates = new Vector.<Number>();
             coordinate(nodes, nodeCoordinates);
@@ -177,6 +177,7 @@ package com.finegamedesign.tenseconds
             for (var n:int = 0; n < connections.length; n++) {
                 for (var b:int = 0; b < connections[n].length; b++) {
                     var indexes:Array = [];
+                    var waypoints:Array = [];
                     var coordinates:Vector.<Number> = new Vector.<Number>();
                     var rotation:Number = buttonRotations[n][n + b];
                     var origin:int = fromNode(rotation, nodes[n], margin);
@@ -184,9 +185,9 @@ package com.finegamedesign.tenseconds
                         throw new Error("Expected origin on grid rotation " 
                             + rotation + " from node " + nodes[n]);
                     }
-                    indexes.push(origin);
+                    waypoints.push({index: origin, rotation: rotation});
                     if (turn) {
-                        turns(rotation, origin, turnMax, indexes);
+                        turns(turnMax, waypoints);
                     }
                     rotation = buttonRotations[connections[n][b]][n];
                     var destination:int = fromNode(rotation, nodes[connections[n][b]], margin);
@@ -195,15 +196,18 @@ package com.finegamedesign.tenseconds
                             + rotation + " from node " + nodes[n]);
                     }
                     if (turn) {
-                        var reverse:Array = [destination];
-                        turns(rotation, destination, turnMax, reverse);
+                        var reverse:Array = [{index: destination, rotation: rotation}];
+                        turns(turnMax, reverse);
                         reverse.reverse();
-                        indexes = indexes.concat(reverse);
+                        turnToward(waypoints[waypoints.length - 1], reverse[0], waypoints);
+                        waypoints = waypoints.concat(reverse);
                     }
                     else {
-                        indexes.push(destination);
+                        waypoints.push({index: destination, rotation: rotation});
                     }
-                                        
+                    for (var i:int = 0; i < waypoints.length; i++) {
+                        indexes.push(waypoints[i].index);
+                    }
                     coordinate(indexes, coordinates);
                     paths.push(coordinates);
                 }
@@ -211,21 +215,36 @@ package com.finegamedesign.tenseconds
             return paths;
         }
 
-        private function turns(rotation:Number, origin:int, turnMax:int, indexes:Array):void
+        private function turns(turnMax:int, waypoints:Array):void
         {
-            var waypoint:Object = {rotation: rotation, index: origin};
+            var waypoint:Object = waypoints[waypoints.length - 1];
             for (var turnCount:int = 0; turnCount < turnMax; turnCount++) { 
                 waypoint = turnFromNode(waypoint["rotation"], waypoint["index"]);
-                indexes.push(waypoint["index"]);
-                etch(indexes[indexes.length - 2], indexes[indexes.length - 1]);
+                waypoints.push(waypoint);
+                etch(waypoints[waypoints.length - 2].index, 
+                    waypoints[waypoints.length - 1].index);
             }
         }
 
         /**
-         * If would backtrack, turn around.
+         * TODO: If would backtrack, turn around.  Append to waypoints.
+         * Rotate first toward second.
          */
-        private function turnFromTo(origin:int, destination:int, indexes:Array):void
+        private function turnToward(from:Object, to:Object, waypoints:Array):void
         {
+            var fromC:int = from.index % columnCount;
+            var fromR:int = from.index / columnCount;
+            var toC:int = to.index % columnCount;
+            var toR:int = to.index / columnCount;
+            var bridge:* = {index: fromC + toR * columnCount, 
+                rotation: 0};
+            if (fromC == toC) {
+                if (fromR < toR) {
+                    if (from.rotation == 0) {
+                    }
+                }
+            }
+            waypoints.push(bridge);
         }
 
         /**

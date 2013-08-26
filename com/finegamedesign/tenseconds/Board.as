@@ -27,6 +27,7 @@ package com.finegamedesign.tenseconds
                 for (var xy:int = 2; xy < path.length - 1; xy += 2) {
                     child.graphics.lineTo(path[xy], path[xy + 1]);
                 }
+                child.alpha = 0.5;
                 display.addChild(child);
             }
         }
