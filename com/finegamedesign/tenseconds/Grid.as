@@ -46,7 +46,7 @@ package com.finegamedesign.tenseconds
                 pathsVertical[i] = false;
                 pathsHorizontal[i] = false;
             }
-            nodeCount = Math.max(2, Math.min(5, 1 + level / 12));
+            nodeCount = Math.max(2, Math.min(5, 2 + level / 20));
             turnMax = Math.min(8, 0 + level / 10);
             nodes = specifyNodes();
             nodeCoordinates = new Vector.<Number>();

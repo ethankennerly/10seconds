@@ -65,7 +65,7 @@ package com.finegamedesign.tenseconds
 
         public function next():void
         {
-            if (currentLabel == "start" && 45 <= Trial.level) {
+            if (currentLabel == "start" && 30 <= Trial.level) {
                 gotoAndPlay("random");
             }
             else if (currentFrame < totalFrames) {
