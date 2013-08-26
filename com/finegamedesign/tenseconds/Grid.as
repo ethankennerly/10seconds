@@ -20,11 +20,13 @@ package com.finegamedesign.tenseconds
         internal var nodeCoordinates:Vector.<Number>;
         internal var nodeCount:int;
         internal var nodePixelsRadius:int;
+        internal var paths:Array;
+        internal var pathsHorizontal:Array;
+        internal var pathsVertical:Array;
         internal var rowCount:int;
         internal var width:int;
         internal var top:int;
         internal var turnMax:int;
-        internal var paths:Array;
 
         public function Grid(level:int)
         {
@@ -36,11 +38,15 @@ package com.finegamedesign.tenseconds
             columnCount = width / cellPixels;
             rowCount = (height - top) / cellPixels;
             cells = [];
+            pathsVertical = [];
+            pathsHorizontal = [];
             cellCount = columnCount * rowCount;
             for (var i:int = 0; i < cellCount; i++) {
                 cells.push(0);
+                pathsVertical[i] = false;
+                pathsHorizontal[i] = false;
             }
-            nodeCount = Math.min(5, 1 + level / 25);
+            nodeCount = Math.max(2, Math.min(5, 1 + level / 24));
             turnMax = Math.min(8, 0 + level / 20);
             nodes = specifyNodes();
             nodeCoordinates = new Vector.<Number>();
@@ -60,6 +66,7 @@ package com.finegamedesign.tenseconds
             var indexes:Array = [];
             var columnCenter:int = columnCount / 2;
             var rowCenter:int = rowCount / 2;
+            var margin2:int = margin * 5 / nodeCount;
             for (var i:int = 0; i < cellCount; i++) {
                 var c:int = i % columnCount;
                 var r:int = i / columnCount;
@@ -97,7 +104,10 @@ package com.finegamedesign.tenseconds
                         succeeded = false;
                         break;
                     }
-                    var s:int = 0;  //Math.random() * 10;
+                    if (shuffleNodes) {
+                        shuffle(remaining);
+                    }
+                    var s:int = 0;
                     selected.push(remaining[s]);
                     var selectedColumn:int = remaining[s] % columnCount;
                     var selectedRow:int = remaining[s] / columnCount;
@@ -107,9 +117,6 @@ package com.finegamedesign.tenseconds
                         if (Math.abs(r - selectedRow) <= nodeMargin && Math.abs(c - selectedColumn) <= nodeMargin) {
                             remaining.splice(i, 1);
                         }
-                    }
-                    if (shuffleNodes) {
-                        shuffle(remaining);
                     }
                 }
             }
@@ -172,7 +179,7 @@ package com.finegamedesign.tenseconds
                     var indexes:Array = [];
                     var coordinates:Vector.<Number> = new Vector.<Number>();
                     var rotation:Number = buttonRotations[n][n + b];
-                    var origin:int = fromNode(rotation, nodes[n]);
+                    var origin:int = fromNode(rotation, nodes[n], margin);
                     if (origin <= -1) {
                         throw new Error("Expected origin on grid rotation " 
                             + rotation + " from node " + nodes[n]);
@@ -182,15 +189,20 @@ package com.finegamedesign.tenseconds
                         turns(rotation, origin, turnMax, indexes);
                     }
                     rotation = buttonRotations[connections[n][b]][n];
-                    var destination:int = fromNode(rotation, nodes[connections[n][b]]);
+                    var destination:int = fromNode(rotation, nodes[connections[n][b]], margin);
                     if (destination <= -1) {
                         throw new Error("Expected origin on grid rotation " 
                             + rotation + " from node " + nodes[n]);
                     }
                     if (turn) {
-                        turns(rotation, destination, turnMax, indexes);
+                        var reverse:Array = [destination];
+                        turns(rotation, destination, turnMax, reverse);
+                        reverse.reverse();
+                        indexes = indexes.concat(reverse);
                     }
-                    indexes.push(destination);
+                    else {
+                        indexes.push(destination);
+                    }
                                         
                     coordinate(indexes, coordinates);
                     paths.push(coordinates);
@@ -205,17 +217,68 @@ package com.finegamedesign.tenseconds
             for (var turnCount:int = 0; turnCount < turnMax; turnCount++) { 
                 waypoint = turnFromNode(waypoint["rotation"], waypoint["index"]);
                 indexes.push(waypoint["index"]);
+                etch(indexes[indexes.length - 2], indexes[indexes.length - 1]);
+            }
+        }
+
+        /**
+         * If would backtrack, turn around.
+         */
+        private function turnFromTo(origin:int, destination:int, indexes:Array):void
+        {
+        }
+
+        /**
+         * Record path horizontals and path verticals.
+         */
+        private function etch(from:int, to:int):void
+        {
+            var fromC:int = from % columnCount;
+            var fromR:int = from / columnCount;
+            var toC:int = to % columnCount;
+            var toR:int = to / columnCount;
+            var i:int;
+            if (fromC == toC) {
+                for (var r:int = Math.min(fromR, toR); r < Math.max(fromR, toR); r++) {
+                    i = fromC + r * columnCount;
+                    pathsVertical[i] = true;
+                }
+            }
+            else if (fromR == toR) {
+                for (var c:int = Math.min(fromC, toC); c < Math.max(fromC, toC); c++) {
+                    i = c + fromR * columnCount;
+                    pathsHorizontal[i] = true;
+                }
+            }
+        }
+    
+        /**
+         * TODO: Avoid parallel overlap.  Select cell before this.
+         */
+        private function avoidParallelOverlap(waypoint:Object):void
+        {
+            var i:int, t:int; 
+            if (0 == int(Math.round(waypoint.rotation)) % 180) {
+                for (i = waypoint.index, t = 0; 
+                    (pathsHorizontal[i] || pathsVertical[i]) && t < margin - 1; 
+                    i -= relative(waypoint.rotation).x, t++) {}
+                waypoint.index = i;
+            }
+            else {
+                for (i = waypoint.index, t = 0; 
+                    (pathsHorizontal[i] || pathsVertical[i]) && t < margin - 1; 
+                    i -= relative(waypoint.rotation).y, t++) {}
+                waypoint.index = i;
             }
         }
 
         /**
          * @return  -1 if wrapping an edge.
          */
-        private function fromNode(rotation:Number, index:int):int
+        private function fromNode(rotation:Number, index:int, margin:int):int
         {
-            var radians:Number = rotation * Math.PI / 180.0;
-            var columnOffset:int = margin * Math.cos(radians);
-            var rowOffset:int = margin * Math.sin(radians);
+            var columnOffset:int = margin * relative(rotation).x;
+            var rowOffset:int = margin * relative(rotation).y;
             var c:int = index % columnCount + columnOffset;
             var r:int = index / columnCount + rowOffset;
             if (c < 0 || columnCount <= c || r < 0 || rowCount <= r) {
@@ -227,6 +290,12 @@ package com.finegamedesign.tenseconds
             return index;
         }
 
+        private function relative(degrees:Number):Object
+        {
+            var radians:Number = degrees * Math.PI / 180.0;
+            return {x: Math.cos(radians), y: Math.sin(radians)};
+        }
+
         /**
          * Avoid button areas.
          * @return  waypoint with a rotation and index.
@@ -236,7 +305,7 @@ package com.finegamedesign.tenseconds
             var maybes:Array = [];
             for (var i:int = -1; i < 2; i++) {
                 var mayRotate:Number = rotation + 90 * i;
-                var maybe:int = fromNode(mayRotate, index);
+                var maybe:int = fromNode(mayRotate, index, 2 + margin * Math.random());
                 if (0 <= maybe) {
                     maybes.push({index: maybe, rotation: mayRotate});
                 }
@@ -253,7 +322,26 @@ package com.finegamedesign.tenseconds
             if (1 <= clears.length) {
                 maybes = clears;
             }
-            return maybes[int(Math.random() * maybes.length)];
+            else {
+                trace("Grid.turnFromHere: Must go through button.");
+            }
+            var waypoint:Object = maybes[drawTurn() % maybes.length];
+            avoidParallelOverlap(waypoint);
+            return waypoint;
+        }
+
+        private var deck:Array;
+
+        private function drawTurn():int
+        {
+            if (null == deck || deck.length <= 0) {
+                deck = [];
+                for (var i:int = 0; i < 3; i++) {
+                    deck.push(i);
+                }
+                shuffle(deck);
+            }
+            return deck.shift();
         }
 
         private function noButtonHere(index:int):Boolean
