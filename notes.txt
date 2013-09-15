@@ -1,4 +1,7 @@
 TODO
+	when click, highlight corresponding wire.
+	Correct. Level up.  Shohs expects to understand why level up amount?
+		level decrements with time.
 	end tail rotated toward other tail.
 	connect tails.
 	do not overlap own path

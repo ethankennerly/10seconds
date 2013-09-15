@@ -137,11 +137,11 @@ package com.finegamedesign.tenseconds
          * Position at center of cell at each index.
          * @param   coordinates     Push in place <x0, y0, x1, y1, ...>
          */
-        private function coordinate(indexes:Array, coordinates:Vector.<Number>):void
+        private function coordinate(indexes:Array, coordinates:Vector.<Number>, offset:int=0):void
         {
             for (var i:int = 0; i < indexes.length; i++) {
-                coordinates.push(cellPixels * ((indexes[i] % columnCount) + 0.5));
-                coordinates.push(cellPixels * (int(indexes[i] / columnCount) + 0.5) + top);
+                coordinates.push(cellPixels * ((indexes[i] % columnCount) + 0.5) + offset);
+                coordinates.push(cellPixels * (int(indexes[i] / columnCount) + 0.5) + top + offset);
             }
         }
 
@@ -208,7 +208,7 @@ package com.finegamedesign.tenseconds
                     for (var i:int = 0; i < waypoints.length; i++) {
                         indexes.push(waypoints[i].index);
                     }
-                    coordinate(indexes, coordinates);
+                    coordinate(indexes, coordinates, (n + b) * cellPixels / connections.length);
                     paths.push(coordinates);
                 }
             }

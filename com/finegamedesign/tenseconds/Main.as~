@@ -101,8 +101,7 @@ package com.finegamedesign.tenseconds
             // After stage is setup, connect to Kongregate.
             // http://flixel.org/forums/index.php?topic=293.0
             // http://www.photonstorm.com/tags/kongregate
-            if (! FlxKongregate.hasLoaded && stage != null) {
-                FlxKongregate.stage = stage;
+            if (! FlxKongregate.hasLoaded) {
                 FlxKongregate.init(FlxKongregate.connect);
             }
             if (inTrial) {
